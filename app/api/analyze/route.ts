@@ -10,11 +10,57 @@ interface AnalysisRequest {
   newRequest: string;
 }
 
-interface AnalysisResponse {
-  verdict: 'In Scope' | 'Out of Scope' | 'Gray Area';
+interface ScopeFlag {
+  item: string;
+  status: 'out_of_scope' | 'gray_area' | 'in_scope';
   explanation: string;
-  clientResponse: string;
+  estimated_cost: string | null;
 }
+
+interface ScopeVerdict {
+  verdict: 'out_of_scope' | 'gray_area' | 'in_scope';
+  severity: number;
+  summary: string;
+  flags: ScopeFlag[];
+  strategic_note: string | null;
+  response_firm: string;
+  response_flexible: string | null;
+}
+
+const SYSTEM_PROMPT = `You are ScopeShield, a scope creep analyzer for freelancers and contractors. Your job is to compare an original contract/SOW against a new client request and determine if the request falls within scope.
+
+You MUST respond with valid JSON only. No markdown, no backticks, no preamble. Just the JSON object.
+
+Analyze the request and return a JSON object with this exact structure:
+
+{
+  "verdict": "out_of_scope" | "gray_area" | "in_scope",
+  "severity": <number 0-100>,
+  "summary": "<one sentence verdict>",
+  "flags": [
+    {
+      "item": "<what the client is asking for>",
+      "status": "out_of_scope" | "gray_area" | "in_scope",
+      "explanation": "<2-3 sentences explaining why this is or isn't in scope>",
+      "estimated_cost": "<dollar range like '$500–$1,000' or null if in scope>"
+    }
+  ],
+  "strategic_note": "<1-2 sentences of relationship/business advice for the freelancer, or null if straightforward>",
+  "response_firm": "<professional, boundary-setting email response the freelancer can send. 100-200 words. Friendly but clear about what's in scope and what costs extra. Include specific pricing for out-of-scope items.>",
+  "response_flexible": "<warmer, relationship-first email response. 100-200 words. Acknowledges the request positively, offers a small goodwill gesture if appropriate, but still establishes the boundary and pricing for extras. Only include if verdict is gray_area, otherwise null.>"
+}
+
+RULES:
+- severity 0-25 = in_scope (green). The request is clearly covered by the contract.
+- severity 26-60 = gray_area (amber). Some parts are covered, some aren't, or the contract language is ambiguous.
+- severity 61-100 = out_of_scope (red). The request clearly exceeds what was agreed upon.
+- Each distinct request or feature the client asks for should be a separate flag.
+- Cost estimates should be realistic for the freelance/agency market. Base them on the type of work (web dev, design, copywriting, consulting, etc.) inferred from the contract.
+- The response_firm should always price out-of-scope items individually.
+- The response_flexible should only exist for gray_area verdicts. For clear out_of_scope or in_scope, set it to null.
+- Never be hostile or adversarial in the responses. The tone is professional, confident, and collaborative.
+- If the contract is vague or missing details, note that in the strategic_note and suggest the freelancer tighten their SOW for future projects.
+- Do not add any text outside the JSON object. No explanations, no markdown formatting.`;
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,20 +81,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const systemPrompt = `You are ScopeShield, a scope-creep detection engine. You analyze an original contract/SOW against a new client request. Return a JSON object with three fields: verdict (exactly one of: 'In Scope', 'Out of Scope', 'Gray Area'), explanation (2 sentences max explaining why), and clientResponse (a professional, firm but friendly message the freelancer can send to their client about this request). Be precise and practical.`;
-
-    const userPrompt = `Original Contract/SOW:
-${originalContract}
-
-New Client Request:
-${newRequest}
-
-Please analyze if the new request falls within scope.`;
+    const userPrompt = `CONTRACT:\n${originalContract}\n\nREQUEST:\n${newRequest}`;
 
     const message = await client.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1024,
-      system: systemPrompt,
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2000,
+      system: SYSTEM_PROMPT,
       messages: [
         {
           role: 'user',
@@ -60,28 +98,35 @@ Please analyze if the new request falls within scope.`;
     const responseText =
       message.content[0].type === 'text' ? message.content[0].text : '';
 
-    let analysisResult: AnalysisResponse;
+    let verdict: ScopeVerdict;
     try {
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         throw new Error('No JSON found in response');
       }
-      analysisResult = JSON.parse(jsonMatch[0]);
+      verdict = JSON.parse(jsonMatch[0]);
+
+      // Validate required fields
+      if (!verdict.verdict || !verdict.flags || !verdict.response_firm) {
+        throw new Error('Missing required fields');
+      }
+
+      // Clamp severity to 0-100
+      verdict.severity = Math.max(0, Math.min(100, verdict.severity));
     } catch {
-      return NextResponse.json(
-        { error: 'Failed to parse Claude response' },
-        { status: 500 }
-      );
+      // Fallback error response
+      return NextResponse.json({
+        verdict: 'gray_area',
+        severity: 50,
+        summary: 'Unable to fully analyze. Please try rephrasing your inputs.',
+        flags: [],
+        strategic_note: null,
+        response_firm: "We couldn't generate a response. Please try again with more detail in your contract and request.",
+        response_flexible: null,
+      });
     }
 
-    if (!analysisResult.verdict || !analysisResult.explanation || !analysisResult.clientResponse) {
-      return NextResponse.json(
-        { error: 'Invalid response format from Claude' },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(analysisResult);
+    return NextResponse.json(verdict);
   } catch (error) {
     console.error('Analysis error:', error);
     return NextResponse.json(
