@@ -130,7 +130,7 @@ export default function Home() {
     <main className="min-h-screen bg-dark text-white">
       {showCheckoutSuccess && (
         <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
-          â Payment successful! Your analyses have been reset.
+          ✓ Payment successful! Your analyses have been reset.
         </div>
       )}
 
@@ -138,7 +138,7 @@ export default function Home() {
       <nav className="fixed top-0 w-full bg-dark/95 backdrop-blur border-b border-gold/20 z-40">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 text-2xl font-bold">
-            <span>âï¸</span>
+            <span>⚔️</span>
             <span className="text-gold">ScopeShield</span>
           </div>
           <div className="hidden md:flex gap-6">
@@ -297,7 +297,7 @@ export default function Home() {
                   onClick={copyToClipboard}
                   className="px-6 py-2 bg-gold text-dark font-semibold rounded-lg hover:bg-gold-light transition"
                 >
-                  {copied ? 'â Copied!' : 'Copy to Clipboard'}
+                  {copied ? '✓ Copied!' : 'Copy to Clipboard'}
                 </button>
               </div>
             </div>
@@ -322,15 +322,15 @@ export default function Home() {
               </div>
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">â</span>
+                  <span className="text-gold">✓</span>
                   <span>3 analyses per month</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">â</span>
+                  <span className="text-gold">✓</span>
                   <span>Full analysis and verdict</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">â</span>
+                  <span className="text-gold">✓</span>
                   <span>Ready-to-send responses</span>
                 </li>
               </ul>
@@ -357,19 +357,19 @@ export default function Home() {
               </div>
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">â</span>
+                  <span className="text-gold">✓</span>
                   <span>10 analyses</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">â</span>
+                  <span className="text-gold">✓</span>
                   <span>Full analysis and verdict</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">â</span>
+                  <span className="text-gold">✓</span>
                   <span>Ready-to-send responses</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">â</span>
+                  <span className="text-gold">✓</span>
                   <span>Email support</span>
                 </li>
               </ul>
@@ -393,23 +393,23 @@ export default function Home() {
               </div>
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">â</span>
+                  <span className="text-gold">✓</span>
                   <span>Unlimited analyses</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">â</span>
+                  <span className="text-gold">✓</span>
                   <span>Full analysis and verdict</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">â</span>
+                  <span className="text-gold">✓</span>
                   <span>Ready-to-send responses</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">â</span>
+                  <span className="text-gold">✓</span>
                   <span>Priority email support</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">â</span>
+                  <span className="text-gold">✓</span>
                   <span>API access (coming soon)</span>
                 </li>
               </ul>
@@ -431,7 +431,7 @@ export default function Home() {
             Built with care by freelancers, for freelancers.
           </p>
           <p>
-            Â© 2024 ScopeShield. All rights reserved.
+            © 2024 ScopeShield. All rights reserved.
           </p>
         </div>
       </footer>
