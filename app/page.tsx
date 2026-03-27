@@ -156,10 +156,11 @@ export default function Home() {
       <section className="pt-32 pb-20 px-6 text-center">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Stop Scope Creep <span className="text-gold">Before It Starts</span>
+            Know exactly when to say no {' '}
+            <span className="text-gold">and how to say it.</span>
           </h1>
           <p className="text-xl text-gray-400 mb-8">
-            Paste your contract. Paste the request. Get a verdict in seconds.
+            Paste your contract and the client request. Get a verdict and a ready-to-send response in seconds.
           </p>
           <a
             href="#tool"
@@ -177,7 +178,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-dark/50 border border-gold/20 rounded-lg p-6">
               <div className="text-4xl font-bold text-gold mb-4">1</div>
-              <h3 className="text-xl font-semibold mb-2">Upload Contract</h3>
+              <h3 className="text-xl font-semibold mb-2">Paste Your Contract</h3>
               <p className="text-gray-400">
                 Paste your original contract or scope of work. Include all the details
                 that define what you agreed to deliver.
@@ -193,18 +194,52 @@ export default function Home() {
             </div>
             <div className="bg-dark/50 border border-gold/20 rounded-lg p-6">
               <div className="text-4xl font-bold text-gold mb-4">3</div>
-              <h3 className="text-xl font-semibold mb-2">Get Verdict</h3>
+              <h3 className="text-xl font-semibold mb-2">Get Your Response</h3>
               <p className="text-gray-400">
-                Receive an instant verdict with an explanation and a ready-to-send
-                response for your client.
+                Get an instant verdict and a professional response you can copy-paste to your client in 10 seconds.
               </p>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Example Verdict */}
+      <section className="py-16 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-4">See It In Action</h2>
+          <p className="text-gray-400 text-center mb-10">Here is what a real ScopeShield verdict looks like.</p>
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            <div className="bg-dark/50 border border-gold/20 rounded-lg p-5">
+              <p className="text-xs text-gold font-semibold uppercase tracking-wide mb-2">Contract Excerpt</p>
+              <p className="text-gray-300 text-sm leading-relaxed">Deliverables include a 5-page marketing website with responsive design, one round of revisions, and deployment to client hosting.</p>
+            </div>
+            <div className="bg-dark/50 border border-gold/20 rounded-lg p-5">
+              <p className="text-xs text-gold font-semibold uppercase tracking-wide mb-2">Client Request</p>
+              <p className="text-gray-300 text-sm leading-relaxed">Can you also set up our email newsletter integration and design a custom template for it?</p>
+            </div>
+          </div>
+          <div className="bg-dark/50 border border-gold/20 rounded-lg p-8">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-28 h-28 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#ef444420', borderColor: '#ef4444', borderWidth: '2px' }}>
+                <div className="text-lg font-bold" style={{ color: '#ef4444' }}>Out of Scope</div>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Verdict</h3>
+                <p className="text-gray-400 text-sm">Email newsletter integration and custom template design are not included in the original contract. The scope covers only a 5-page website with one revision round.</p>
+              </div>
+            </div>
+            <div className="border-t border-gold/20 pt-6">
+              <h4 className="text-sm font-semibold text-gold uppercase tracking-wide mb-3">Ready-to-Send Response</h4>
+              <div className="bg-dark rounded-lg p-4 border border-gold/20">
+                <p className="text-gray-300 text-sm leading-relaxed">Hi [Client], thanks for thinking ahead on the newsletter! That falls outside our current scope, which covers the 5-page site build and one revision round. I would be happy to handle the newsletter integration and template as an add-on. I will send over a quick estimate for that separately. Let me know how you would like to proceed!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Analysis Tool */}
-      <section id="tool" className="py-16 px-6">
+      <section id="tool" className="py-16 px-6 scroll-mt-20">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-8">Scope Analyzer</h2>
 
@@ -237,7 +272,7 @@ export default function Home() {
               <textarea
                 value={originalContract}
                 onChange={(e) => setOriginalContract(e.target.value)}
-                placeholder="Paste your original contract or scope of work here..."
+                placeholder="e.g. Deliverables include a 5-page marketing website with responsive design, one round of revisions, and deployment to client hosting..."
                 className="w-full h-48 bg-dark/50 border border-gold/20 rounded-lg p-4 text-white placeholder-gray-500 focus:outline-none focus:border-gold/50 resize-none"
               />
             </div>
@@ -246,7 +281,7 @@ export default function Home() {
               <textarea
                 value={newRequest}
                 onChange={(e) => setNewRequest(e.target.value)}
-                placeholder="Paste the new request or change here..."
+                placeholder="e.g. Can you also set up our email newsletter integration and design a custom template for it?"
                 className="w-full h-48 bg-dark/50 border border-gold/20 rounded-lg p-4 text-white placeholder-gray-500 focus:outline-none focus:border-gold/50 resize-none"
               />
             </div>
@@ -309,12 +344,12 @@ export default function Home() {
       <section id="pricing" className="py-16 px-6 bg-gradient-to-b from-dark/50 to-dark">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">Simple, Transparent Pricing</h2>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
             {/* Free Tier */}
             <div className="bg-dark/50 border border-gold/20 rounded-lg p-8 flex flex-col">
               <div className="mb-6">
                 <h3 className="text-2xl font-bold mb-2">Free</h3>
-                <p className="text-gray-400">Perfect for trying it out</p>
+                <p className="text-gray-400">Try it out</p>
               </div>
               <div className="mb-6">
                 <div className="text-4xl font-bold text-gold mb-1">$0</div>
@@ -322,16 +357,16 @@ export default function Home() {
               </div>
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span>
+                  <span className="text-gold">{'\u2713'}</span>
                   <span>3 analyses per month</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span>
-                  <span>Full analysis and verdict</span>
+                  <span className="text-gold">{'\u2713'}</span>
+                  <span>Full verdict and explanation</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span>
-                  <span>Ready-to-send responses</span>
+                  <span className="text-gold">{'\u2713'}</span>
+                  <span>Ready-to-send client response</span>
                 </li>
               </ul>
               <button
@@ -342,82 +377,42 @@ export default function Home() {
               </button>
             </div>
 
-            {/* $5 Tier */}
-            <div className="bg-dark/50 border border-gold/40 rounded-lg p-8 flex flex-col ring-2 ring-gold/20">
+            {/* Pro Tier */}
+            <div className="bg-dark/50 border border-gold/40 rounded-lg p-8 flex flex-col ring-2 ring-gold/20 relative">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gold text-dark px-4 py-1 rounded-full text-sm font-semibold">
-                Popular
+                Most Popular
               </div>
               <div className="mb-6 pt-2">
-                <h3 className="text-2xl font-bold mb-2">Starter</h3>
-                <p className="text-gray-400">For active freelancers</p>
+                <h3 className="text-2xl font-bold mb-2">Pro</h3>
+                <p className="text-gray-400">For working freelancers</p>
               </div>
               <div className="mb-6">
-                <div className="text-4xl font-bold text-gold mb-1">$5</div>
-                <p className="text-sm text-gray-400">One-time payment</p>
-              </div>
-              <ul className="space-y-3 mb-8 flex-grow">
-                <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span>
-                  <span>10 analyses</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span>
-                  <span>Full analysis and verdict</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span>
-                  <span>Ready-to-send responses</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span>
-                  <span>Email support</span>
-                </li>
-              </ul>
-              <button
-                onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_10 || '')}
-                className="w-full py-3 bg-gold text-dark font-semibold rounded-lg hover:bg-gold-light transition"
-              >
-                Get Started
-              </button>
-            </div>
-
-            {/* Unlimited Tier */}
-            <div className="bg-dark/50 border border-gold/20 rounded-lg p-8 flex flex-col">
-              <div className="mb-6">
-                <h3 className="text-2xl font-bold mb-2">Unlimited</h3>
-                <p className="text-gray-400">For power users</p>
-              </div>
-              <div className="mb-6">
-                <div className="text-4xl font-bold text-gold mb-1">$19</div>
+                <div className="text-4xl font-bold text-gold mb-1">$9</div>
                 <p className="text-sm text-gray-400">Per month</p>
               </div>
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span>
+                  <span className="text-gold">{'\u2713'}</span>
                   <span>Unlimited analyses</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span>
-                  <span>Full analysis and verdict</span>
+                  <span className="text-gold">{'\u2713'}</span>
+                  <span>Full verdict and explanation</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span>
-                  <span>Ready-to-send responses</span>
+                  <span className="text-gold">{'\u2713'}</span>
+                  <span>Ready-to-send client response</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span>
-                  <span>Priority email support</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span>
-                  <span>API access (coming soon)</span>
+                  <span className="text-gold">{'\u2713'}</span>
+                  <span>Email support</span>
                 </li>
               </ul>
               <button
                 onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_UNLIMITED || '')}
                 className="w-full py-3 bg-gold text-dark font-semibold rounded-lg hover:bg-gold-light transition"
               >
-                Subscribe
+                Go Pro
               </button>
             </div>
           </div>
@@ -428,13 +423,14 @@ export default function Home() {
       <footer className="border-t border-gold/20 py-12 px-6 bg-dark/50">
         <div className="max-w-6xl mx-auto text-center text-gray-500 text-sm">
           <p className="mb-4">
-            Built with care by freelancers, for freelancers.
+            Built for designers, devs, and consultants who are done working for free.
           </p>
           <p>
-            © 2024 ScopeShield. All rights reserved.
+            {'\u00A9'} 2025{'\u2013'}2026 ScopeShield. All rights reserved.
           </p>
         </div>
       </footer>
     </main>
   );
 }
+
