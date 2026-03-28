@@ -58,8 +58,21 @@ export default function Home() {
 
   useEffect(() => {
     const savedAnalyses = localStorage.getItem('scopeshield_analyses');
-    if (savedAnalyses) {
+    const savedTimestamp = localStorage.getItem('scopeshield_reset_at');
+    const now = Date.now();
+
+    if (savedTimestamp && now > parseInt(savedTimestamp, 10)) {
+      // 24 hours passed â reset
+      localStorage.setItem('scopeshield_analyses', '0');
+      localStorage.setItem('scopeshield_reset_at', (now + 86400000).toString());
+      setAnalysesUsed(0);
+    } else if (savedAnalyses) {
       setAnalysesUsed(parseInt(savedAnalyses, 10));
+      if (!savedTimestamp) {
+        localStorage.setItem('scopeshield_reset_at', (now + 86400000).toString());
+      }
+    } else {
+      localStorage.setItem('scopeshield_reset_at', (now + 86400000).toString());
     }
 
     const params = new URLSearchParams(window.location.search);
