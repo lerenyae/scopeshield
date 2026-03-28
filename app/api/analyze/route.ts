@@ -15,6 +15,7 @@ interface ScopeFlag {
   status: 'out_of_scope' | 'gray_area' | 'in_scope';
   explanation: string;
   estimated_cost: string | null;
+  cost_basis: string | null;
 }
 
 interface ScopeVerdict {
@@ -42,7 +43,8 @@ Analyze the request and return a JSON object with this exact structure:
       "item": "<what the client is asking for>",
       "status": "out_of_scope" | "gray_area" | "in_scope",
       "explanation": "<2-3 sentences explaining why this is or isn't in scope>",
-      "estimated_cost": "<dollar range like '$500–$1,000' or null if in scope>"
+      "estimated_cost": "<dollar range like '$500\u2013$1,000' or null if in scope>",
+      "cost_basis": "<how you calculated it, e.g. '~8-12 hrs @ $75-100/hr (mid-market freelance rate for web development)' or null if in scope>"
     }
   ],
   "strategic_note": "<1-2 sentences of relationship/business advice for the freelancer, or null if straightforward>",
@@ -56,6 +58,7 @@ RULES:
 - severity 61-100 = out_of_scope (red). The request clearly exceeds what was agreed upon.
 - Each distinct request or feature the client asks for should be a separate flag.
 - Cost estimates should be realistic for the freelance/agency market. Base them on the type of work (web dev, design, copywriting, consulting, etc.) inferred from the contract.
+- Always include cost_basis for every flag with an estimated_cost. Show the estimated hours and hourly rate range used. Example: "~4-6 hrs @ $100-150/hr (mid-market freelance web dev rate)".
 - The response_firm should always price out-of-scope items individually.
 - The response_flexible should only exist for gray_area verdicts. For clear out_of_scope or in_scope, set it to null.
 - Never be hostile or adversarial in the responses. The tone is professional, confident, and collaborative.
@@ -81,7 +84,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const userPrompt = `CONTRACT:\n${originalContract}\n\nREQUEST:\n${newRequest}`;
+    const userPrompt = \`CONTRACT:\n\${originalContract}\n\nREQUEST:\n\${newRequest}\`;
 
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
@@ -135,3 +138,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
