@@ -43,7 +43,7 @@ Analyze the request and return a JSON object with this exact structure:
       "item": "<what the client is asking for>",
       "status": "out_of_scope" | "gray_area" | "in_scope",
       "explanation": "<2-3 sentences explaining why this is or isn't in scope>",
-      "estimated_cost": "<dollar range like '$500\u2013$1,000' or null if in scope>",
+      "estimated_cost": "<dollar range like '$500â$1,000' or null if in scope>",
       "cost_basis": "<how you calculated it, e.g. '~8-12 hrs @ $75-100/hr (mid-market freelance rate for web development)' or null if in scope>"
     }
   ],
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const userPrompt = \`CONTRACT:\n\${originalContract}\n\nREQUEST:\n\${newRequest}\`;
+    const userPrompt = `CONTRACT:\n${originalContract}\n\nREQUEST:\n${newRequest}`;
 
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
@@ -138,4 +138,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
