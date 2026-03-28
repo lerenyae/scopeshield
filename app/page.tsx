@@ -7,6 +7,7 @@ interface ScopeFlag {
   status: 'out_of_scope' | 'gray_area' | 'in_scope';
   explanation: string;
   estimated_cost: string | null;
+  cost_basis: string | null;
 }
 
 interface ScopeVerdict {
@@ -398,6 +399,11 @@ export default function Home() {
                             )}
                           </div>
                           <p className="text-sm text-gray-400">{flag.explanation}</p>
+                          {flag.cost_basis && (
+                            <p className="text-xs text-gray-500 mt-1 italic">
+                              Estimate basis: {flag.cost_basis}
+                            </p>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -415,21 +421,22 @@ export default function Home() {
 
               {/* Response Tabs */}
               <div className="bg-dark/50 border border-gold/20 rounded-lg p-8">
-                <h4 className="text-lg font-semibold mb-4">Ready-to-Send Response</h4>
+                <h4 className="text-lg font-semibold mb-2">Ready-to-Send Response</h4>
+                <p className="text-xs text-gray-500 mb-4">Copy and send directly to your client.</p>
 
                 {/* Tab buttons */}
-                <div className="flex gap-2 mb-4">
-                  <button
-                    onClick={() => setActiveResponseTab('firm')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                      activeResponseTab === 'firm'
-                        ? 'bg-gold text-dark'
-                        : 'bg-gray-800 text-gray-400 hover:text-white'
-                    }`}
-                  >
-                    Firm
-                  </button>
-                  {result.response_flexible && (
+                {result.response_flexible ? (
+                  <div className="flex gap-2 mb-4">
+                    <button
+                      onClick={() => setActiveResponseTab('firm')}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                        activeResponseTab === 'firm'
+                          ? 'bg-gold text-dark'
+                          : 'bg-gray-800 text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      Hold the Line
+                    </button>
                     <button
                       onClick={() => setActiveResponseTab('flexible')}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
@@ -438,10 +445,19 @@ export default function Home() {
                           : 'bg-gray-800 text-gray-400 hover:text-white'
                       }`}
                     >
-                      Flexible
+                      Keep It Warm
                     </button>
-                  )}
-                </div>
+                  </div>
+                ) : null}
+
+                {/* Tab description */}
+                {result.response_flexible && (
+                  <p className="text-xs text-gray-500 mb-3">
+                    {activeResponseTab === 'firm'
+                      ? 'Clear boundaries. Prices the extras. Professional and direct.'
+                      : 'Relationship-first. Acknowledges the ask warmly, still draws the line.'}
+                  </p>
+                )}
 
                 {/* Tab content */}
                 <div className="bg-dark rounded-lg p-4 border border-gold/20 mb-4">
