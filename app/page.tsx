@@ -2,25 +2,58 @@
 
 import { useState, useEffect } from 'react';
 
-interface AnalysisResult {
-  verdict: 'In Scope' | 'Out of Scope' | 'Gray Area';
+interface ScopeFlag {
+  item: string;
+  status: 'out_of_scope' | 'gray_area' | 'in_scope';
   explanation: string;
-  clientResponse: string;
+  estimated_cost: string | null;
+}
+
+interface ScopeVerdict {
+  verdict: 'out_of_scope' | 'gray_area' | 'in_scope';
+  severity: number;
+  summary: string;
+  flags: ScopeFlag[];
+  strategic_note: string | null;
+  response_firm: string;
+  response_flexible: string | null;
 }
 
 const ANALYSES_PER_TIER = {
   free: 3,
 };
 
+const VERDICT_CONFIG = {
+  out_of_scope: {
+    label: 'Out of Scope',
+    color: '#E24B4A',
+    bgColor: '#E24B4A20',
+    badgeBg: '#E24B4A30',
+  },
+  gray_area: {
+    label: 'Gray Area',
+    color: '#BA7517',
+    bgColor: '#BA751720',
+    badgeBg: '#BA751730',
+  },
+  in_scope: {
+    label: 'In Scope',
+    color: '#639922',
+    bgColor: '#63992220',
+    badgeBg: '#63992230',
+  },
+};
+
 export default function Home() {
   const [originalContract, setOriginalContract] = useState('');
   const [newRequest, setNewRequest] = useState('');
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [result, setResult] = useState<ScopeVerdict | null>(null);
   const [error, setError] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [copiedTab, setCopiedTab] = useState<string | null>(null);
   const [analysesUsed, setAnalysesUsed] = useState(0);
   const [showCheckoutSuccess, setShowCheckoutSuccess] = useState(false);
+  const [activeResponseTab, setActiveResponseTab] = useState<'firm' | 'flexible'>('firm');
 
   useEffect(() => {
     const savedAnalyses = localStorage.getItem('scopeshield_analyses');
@@ -54,6 +87,7 @@ export default function Home() {
     setLoading(true);
     setError('');
     setResult(null);
+    setActiveResponseTab('firm');
 
     try {
       const response = await fetch('/api/analyze', {
@@ -69,7 +103,7 @@ export default function Home() {
         throw new Error('Failed to analyze request');
       }
 
-      const data: AnalysisResult = await response.json();
+      const data: ScopeVerdict = await response.json();
       setResult(data);
 
       const newTotal = analysesUsed + 1;
@@ -83,22 +117,20 @@ export default function Home() {
     }
   };
 
-  const copyToClipboard = () => {
-    if (result?.clientResponse) {
-      navigator.clipboard.writeText(result.clientResponse);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+  const copyToClipboard = (text: string, tab: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedTab(tab);
+    setTimeout(() => setCopiedTab(null), 2000);
   };
 
-  const getVerdictColor = (verdict: string) => {
-    switch (verdict) {
-      case 'In Scope':
-        return '#10b981';
-      case 'Out of Scope':
-        return '#ef4444';
-      case 'Gray Area':
-        return '#D4A843';
+  const getFlagColor = (status: string) => {
+    switch (status) {
+      case 'out_of_scope':
+        return '#E24B4A';
+      case 'gray_area':
+        return '#BA7517';
+      case 'in_scope':
+        return '#639922';
       default:
         return '#6b7280';
     }
@@ -130,7 +162,7 @@ export default function Home() {
     <main className="min-h-screen bg-dark text-white">
       {showCheckoutSuccess && (
         <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
-          ✓ Payment successful! Your analyses have been reset.
+          {'\u2713'} Payment successful! Your analyses have been reset.
         </div>
       )}
 
@@ -138,7 +170,7 @@ export default function Home() {
       <nav className="fixed top-0 w-full bg-dark/95 backdrop-blur border-b border-gold/20 z-40">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 text-2xl font-bold">
-            <span>⚔️</span>
+            <span>{String.fromCodePoint(0x2694, 0xFE0F)}</span>
             <span className="text-gold">ScopeShield</span>
           </div>
           <div className="hidden md:flex gap-6">
@@ -188,8 +220,8 @@ export default function Home() {
               <div className="text-4xl font-bold text-gold mb-4">2</div>
               <h3 className="text-xl font-semibold mb-2">Paste Request</h3>
               <p className="text-gray-400">
-                Add the new client request or change they're asking for. Be specific
-                about what exactly they're adding or modifying.
+                Add the new client request or change they{String.fromCodePoint(0x2019)}re asking for. Be specific
+                about what exactly they{String.fromCodePoint(0x2019)}re adding or modifying.
               </p>
             </div>
             <div className="bg-dark/50 border border-gold/20 rounded-lg p-6">
@@ -220,8 +252,8 @@ export default function Home() {
           </div>
           <div className="bg-dark/50 border border-gold/20 rounded-lg p-8">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-28 h-28 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#ef444420', borderColor: '#ef4444', borderWidth: '2px' }}>
-                <div className="text-lg font-bold" style={{ color: '#ef4444' }}>Out of Scope</div>
+              <div className="w-28 h-28 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#E24B4A20', borderColor: '#E24B4A', borderWidth: '2px' }}>
+                <div className="text-lg font-bold" style={{ color: '#E24B4A' }}>Out of Scope</div>
               </div>
               <div>
                 <h3 className="text-xl font-semibold mb-2">Verdict</h3>
@@ -255,7 +287,7 @@ export default function Home() {
           {!canAnalyze && (
             <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6 text-center">
               <p className="text-sm">
-                You've used all your free analyses.{' '}
+                You{String.fromCodePoint(0x2019)}ve used all your free analyses.{' '}
                 <button
                   onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
                   className="text-gold font-semibold hover:underline"
@@ -301,38 +333,135 @@ export default function Home() {
             {loading ? 'Analyzing...' : 'Analyze Scope'}
           </button>
 
+          {/* Verdict Result */}
           {result && (
-            <div className="space-y-6 bg-dark/50 border border-gold/20 rounded-lg p-8">
-              <div className="flex items-center gap-4">
-                <div
-                  className="w-32 h-32 rounded-lg flex items-center justify-center"
-                  style={{ backgroundColor: `${getVerdictColor(result.verdict)}20`, borderColor: getVerdictColor(result.verdict), borderWidth: '2px' }}
-                >
-                  <div className="text-center">
-                    <div
-                      className="text-lg font-bold"
-                      style={{ color: getVerdictColor(result.verdict) }}
-                    >
-                      {result.verdict}
-                    </div>
+            <div className="space-y-6">
+              {/* Verdict Card + Severity Meter */}
+              <div className="bg-dark/50 border rounded-lg p-8" style={{ borderColor: VERDICT_CONFIG[result.verdict].color + '40' }}>
+                <div className="flex items-start gap-6 mb-6">
+                  <div
+                    className="shrink-0 px-4 py-2 rounded-lg text-sm font-bold"
+                    style={{
+                      backgroundColor: VERDICT_CONFIG[result.verdict].badgeBg,
+                      color: VERDICT_CONFIG[result.verdict].color,
+                      border: `1px solid ${VERDICT_CONFIG[result.verdict].color}60`,
+                    }}
+                  >
+                    {VERDICT_CONFIG[result.verdict].label}
                   </div>
+                  <p className="text-lg text-gray-200">{result.summary}</p>
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Analysis Result</h3>
-                  <p className="text-gray-400">{result.explanation}</p>
+
+                {/* Severity Meter */}
+                <div className="mb-2">
+                  <div className="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>In Scope</span>
+                    <span>Severity: {result.severity}/100</span>
+                    <span>Out of Scope</span>
+                  </div>
+                  <div className="w-full h-3 bg-gray-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{
+                        width: `${result.severity}%`,
+                        backgroundColor: VERDICT_CONFIG[result.verdict].color,
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="border-t border-gold/20 pt-6">
-                <h4 className="text-lg font-semibold mb-3">Ready-to-Send Response</h4>
-                <div className="bg-dark rounded-lg p-4 border border-gold/20 mb-4">
-                  <p className="text-gray-300 whitespace-pre-wrap">{result.clientResponse}</p>
+              {/* Flags */}
+              {result.flags.length > 0 && (
+                <div className="bg-dark/50 border border-gold/20 rounded-lg p-8">
+                  <h4 className="text-lg font-semibold mb-4">Breakdown</h4>
+                  <div className="space-y-4">
+                    {result.flags.map((flag, i) => (
+                      <div key={i} className="flex gap-3">
+                        <div
+                          className="shrink-0 w-3 h-3 rounded-full mt-1.5"
+                          style={{ backgroundColor: getFlagColor(flag.status) }}
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-1">
+                            <span className="font-semibold">{flag.item}</span>
+                            {flag.estimated_cost && (
+                              <span
+                                className="text-xs px-2 py-0.5 rounded-full"
+                                style={{
+                                  backgroundColor: getFlagColor(flag.status) + '20',
+                                  color: getFlagColor(flag.status),
+                                }}
+                              >
+                                {flag.estimated_cost}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-400">{flag.explanation}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              )}
+
+              {/* Strategic Note */}
+              {result.strategic_note && (
+                <div className="bg-dark/50 border border-gold/20 rounded-lg p-6">
+                  <h4 className="text-sm font-semibold text-gold uppercase tracking-wide mb-2">Strategic Note</h4>
+                  <p className="text-gray-300 text-sm">{result.strategic_note}</p>
+                </div>
+              )}
+
+              {/* Response Tabs */}
+              <div className="bg-dark/50 border border-gold/20 rounded-lg p-8">
+                <h4 className="text-lg font-semibold mb-4">Ready-to-Send Response</h4>
+
+                {/* Tab buttons */}
+                <div className="flex gap-2 mb-4">
+                  <button
+                    onClick={() => setActiveResponseTab('firm')}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                      activeResponseTab === 'firm'
+                        ? 'bg-gold text-dark'
+                        : 'bg-gray-800 text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    Firm
+                  </button>
+                  {result.response_flexible && (
+                    <button
+                      onClick={() => setActiveResponseTab('flexible')}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                        activeResponseTab === 'flexible'
+                          ? 'bg-gold text-dark'
+                          : 'bg-gray-800 text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      Flexible
+                    </button>
+                  )}
+                </div>
+
+                {/* Tab content */}
+                <div className="bg-dark rounded-lg p-4 border border-gold/20 mb-4">
+                  <p className="text-gray-300 whitespace-pre-wrap text-sm leading-relaxed">
+                    {activeResponseTab === 'firm' ? result.response_firm : result.response_flexible}
+                  </p>
+                </div>
+
                 <button
-                  onClick={copyToClipboard}
+                  onClick={() =>
+                    copyToClipboard(
+                      activeResponseTab === 'firm'
+                        ? result.response_firm
+                        : result.response_flexible || '',
+                      activeResponseTab
+                    )
+                  }
                   className="px-6 py-2 bg-gold text-dark font-semibold rounded-lg hover:bg-gold-light transition"
                 >
-                  {copied ? '✓ Copied!' : 'Copy to Clipboard'}
+                  {copiedTab === activeResponseTab ? `${String.fromCodePoint(0x2713)} Copied!` : 'Copy Response'}
                 </button>
               </div>
             </div>
